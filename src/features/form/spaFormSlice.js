@@ -1,17 +1,26 @@
 import { createSlice, current } from '@reduxjs/toolkit';
+import { loadState, saveState } from './SpaLocalStorage';
+import _ from 'lodash';
 
 export const spaFormSlice = createSlice({
   name: 'spaForm',
-  initialState: [],
+  initialState: loadState() || [],
   reducers: {
-    getFromList: (state, action) => {
-      console.log(state, action);
-    },
     addToList: (state, action) => {
-      state.push(action.payload);
+      var uniqid = String.fromCharCode(65 + Math.floor(Math.random() * 26)) + Date.now();
+      state.push({ ...action.payload, id: uniqid });
+      saveState(current(state));
     },
     deleteFromList: (state, action) => {
-      console.log(state, action);
+      let ids = action.payload;
+
+      console.log("ids", ids);
+
+      if (ids && ids.length > 0) {
+        state = state.filter(function (st) { return !ids.includes(st.id); });
+        saveState(state);
+        return state;
+      }
     },
   },
 });

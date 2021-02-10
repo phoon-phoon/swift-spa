@@ -16,8 +16,8 @@ export function SpaForm() {
 
   const { register, handleSubmit } = useForm()
   const onSubmit = data => {
-    if (data.firstname && data.lastname && 
-      data.gen && data.age && 
+    if (data.firstname && data.lastname &&
+      data.gen && data.age &&
       data.nationality && data.phone_code && data.phone
     ) {
       dispatch(addToList(data));
@@ -36,7 +36,7 @@ export function SpaForm() {
                   First Name
                 </Form.Label>
                 <Col sm="8">
-                  <Form.Control type="text" name="firstname" ref={register} />
+                  <Form.Control type="text" name="firstname" ref={register({ required: true })} />
                 </Col>
               </Form.Group>
             </Col>
@@ -46,7 +46,7 @@ export function SpaForm() {
                   Last Name
                 </Form.Label>
                 <Col sm="8">
-                  <Form.Control type="text" name="lastname" ref={register} />
+                  <Form.Control type="text" name="lastname" ref={register({ required: true })} />
                 </Col>
               </Form.Group>
             </Col>
@@ -59,7 +59,7 @@ export function SpaForm() {
                   Gen
                 </Form.Label>
                 <Col sm="8">
-                  <Form.Control as="select" name="gen" ref={register}>
+                  <Form.Control as="select" name="gen" ref={register({ required: true })}>
                     <option>Male</option>
                     <option>Female</option>
                   </Form.Control>
@@ -72,7 +72,7 @@ export function SpaForm() {
                   Age
                 </Form.Label>
                 <Col sm="8">
-                  <Form.Control type="number" name="age" ref={register} />
+                  <Form.Control type="number" name="age" ref={register({ required: true })} />
                 </Col>
               </Form.Group>
             </Col>
@@ -85,7 +85,7 @@ export function SpaForm() {
                   Nationality
                 </Form.Label>
                 <Col sm="8">
-                  <Form.Control as="select" name="nationality" ref={register}>
+                  <Form.Control as="select" name="nationality" ref={register({ required: true })}>
                     <option>Thai</option>
                     <option>Chinese</option>
                     <option>Russian</option>
@@ -103,12 +103,12 @@ export function SpaForm() {
                 <Col sm="8">
                   <Row>
                     <Col sm="4">
-                      <Form.Control as="select" name="phone_code" ref={register}>
+                      <Form.Control as="select" name="phone_code" ref={register({ required: true })}>
                         <option>+66</option>
                       </Form.Control>
                     </Col>
                     <Col sm="8">
-                      <Form.Control type="text" name="phone" ref={register} />
+                      <Form.Control type="text" name="phone" ref={register({ required: true })} />
                     </Col>
                   </Row>
                 </Col>
