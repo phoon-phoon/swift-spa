@@ -1,0 +1,4 @@
+div.form-check > input {
+  margin-left: -13px;
+  cursor: pointer;
+}

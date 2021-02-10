@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
+import spaFormReducer from '../features/form/spaFormSlice';
 
 export default configureStore({
   reducer: {
-    counter: counterReducer,
+    spaForm: spaFormReducer,
   },
 });
