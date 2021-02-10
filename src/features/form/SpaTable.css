@@ -1,0 +1,35 @@
+table tbody tr td svg:first-child {
+  margin-right: 10px;
+}
+
+table tbody tr td svg {
+  cursor: pointer;
+}
+
+ul.pagination {
+  justify-content: center;
+}
+
+ul.pagination li a {
+  padding: 2px 20px 5px;
+  border: 1px solid #000;
+  margin: 2px;
+  cursor: pointer;
+}
+
+ul.pagination li:hover a {
+  border-color: green;
+  color: green;
+}
+
+ul.pagination li:active a , ul.pagination li.active a {
+  border-color: green;
+  color: white;
+  background-color: green;
+}
+
+ul.pagination li.disabled a {
+  border-color: gray !important;
+  color: gray !important;;
+  cursor: not-allowed;
+}

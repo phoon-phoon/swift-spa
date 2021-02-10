@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
-  getFromList,
-  addToList,
-  deleteFromList
+  addToList
 } from './spaFormSlice';
+import { spa } from './spaSlice';
 
 import { useForm } from 'react-hook-form'
 import { Row, Col, Form, Button } from 'react-bootstrap'
@@ -12,20 +11,38 @@ import { Row, Col, Form, Button } from 'react-bootstrap'
 import './SpaForm.module.css'
 
 export function SpaForm() {
-  const dispatch = useDispatch();
+  const { register, handleSubmit, reset } = useForm()
 
-  const { register, handleSubmit } = useForm()
+  const dispatch = useDispatch();
+  const SPA = useSelector(spa);
+
+  useEffect(() => {
+    if (SPA) { reset(SPA); }
+  }, [SPA]);
+
   const onSubmit = data => {
     if (data.firstname && data.lastname &&
       data.gen && data.age &&
       data.nationality && data.phone_code && data.phone
     ) {
       dispatch(addToList(data));
+
+      reset({
+        id: "",
+        firstname: "",
+        lastname: "",
+        gen: "Male",
+        age: "",
+        nationality: "Thai",
+        phone: "",
+        phone_code: "+66"
+      })
     }
   };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form.Control type="hidden" name="id" ref={register} />
       <Row className="mb-5">
         <Col>
 
@@ -119,11 +136,23 @@ export function SpaForm() {
           <Row className="justify-content-md-center mt-2">
             <Col xs={8} sm={4} md={3}>
               <Button type="submit" className="btn-block" variant="success">SAVE</Button>
+              <Button type="reset" className="btn-block" variant="default" onClick={() => {
+                reset({
+                  id: "",
+                  firstname: "",
+                  lastname: "",
+                  gen: "Male",
+                  age: "",
+                  nationality: "Thai",
+                  phone: "",
+                  phone_code: "+66"
+                })
+              }}>Reset</Button>
             </Col>
           </Row>
 
         </Col>
       </Row>
-    </Form>
+    </Form >
   )
 }

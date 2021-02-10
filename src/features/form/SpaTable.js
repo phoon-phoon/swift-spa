@@ -1,61 +1,91 @@
 import React, { useState, useEffect } from 'react';
+import { orderBy } from 'lodash';
 
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  spaList,
-  addToList,
-  deleteFromList
-} from './spaFormSlice';
+import { spaList, deleteFromList } from './spaFormSlice';
+import { toEdit } from './spaSlice';
 
 import { useForm } from 'react-hook-form'
 
-import { Row, Col, Form, Table, Button, Pagination } from 'react-bootstrap';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Row, Col, Form, Table, Button } from 'react-bootstrap';
+import { FaEdit, FaTrash, FaSortAlphaUp, FaSortAlphaDown } from 'react-icons/fa';
+import ReactPaginate from 'react-paginate';
 
-import './SpaTable.module.css';
+import './SpaTable.css';
 
 export function SpaTable() {
   const dispatch = useDispatch();
+  const { register, handleSubmit } = useForm()
+  const onSubmit = data => {
+    dispatch(deleteFromList(data.ids));
+  };
 
   const SPAs = useSelector(spaList);
   const [finalSPAs, setFinalSPAs] = useState({});
   useEffect(() => {
-    console.log("SPAs", SPAs);
-    let newSPAs = [];
-    for (var i in SPAs) {
-      newSPAs.push(SPAs[i]);
-    }
-    setFinalSPAs(newSPAs);
+    setFinalSPAs(SPAs);
   }, [SPAs]);
 
-  useEffect(() => {
-    console.log("finalSPAs", finalSPAs);
-  }, [finalSPAs]);
-
+  // CHECKBOX
   const [checkAll, setCheckAll] = useState(false);
   const [checkValue, setCheckValue] = useState({});
+
+  const [pages, setPages] = useState({
+    currentPage: 1,
+    perPage: 5,
+    offset: 0
+  });
+  const [sorting, setSorting] = useState({
+    field: "",
+    by: undefined
+  });
+
   useEffect(() => {
-    console.log("checkValue", finalSPAs);
     if (checkValue) {
       let checkValueFiltered = Object.values(checkValue).filter(checkValue => checkValue && checkValue == true);
       setCheckAll(checkValueFiltered.length == finalSPAs.length);
     }
   }, [checkValue]);
 
-  const [sorting, setSorting] = useState({
-    field: "",
-    by: "ASC",
-  });
+  useEffect(() => {
+    if (SPAs && SPAs.length > 0) {
+      let sortedCollection = SPAs;
+      if (sorting.field) {
+        let _sorting = [sorting.field];
+        if (sorting.field == "firstname") {
+          _sorting = [sorting.field, "lastname"]
+        }
+        sortedCollection = orderBy(sortedCollection, _sorting, [sorting.by])
+      }
 
-  const [pages, setPages] = useState({
-    currentPage: 1,
-    perPage: 10
-  });
+      if (pages.offset >= 0 && pages.perPage) {
+        sortedCollection = sortedCollection.slice(pages.offset, pages.offset + pages.perPage);
+      }
+      setFinalSPAs(sortedCollection);
+    }
+  }, [SPAs, sorting, pages]);
 
-  const { register, handleSubmit } = useForm()
-  const onSubmit = data => {
-    dispatch(deleteFromList(data.ids));
-  };
+  const handleSorting = (field) => {
+    let by = "asc";
+    if (field == sorting.field) {
+      if (sorting.by === "asc") {
+        by = "desc";
+      } else if (sorting.by === "desc") {
+        by = "asc";
+      }
+    }
+    setSorting({ field: field, by: by });
+  }
+
+  const handlePageClick = (data) => {
+    let selected = data.selected;
+    let offset = Math.ceil(selected * pages.perPage);
+    setPages({
+      ...pages,
+      currentPage: selected,
+      offset: offset
+    })
+  }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -79,11 +109,21 @@ export function SpaTable() {
             <thead>
               <tr>
                 <th></th>
-                <th>Name</th>
-                <th>Gen</th>
-                <th>Age</th>
-                <th>Nationality</th>
-                <th>Phone</th>
+                <th onClick={() => handleSorting("firstname")} style={{ cursor: "pointer" }}>
+                  Name {sorting.field == "firstname" && (sorting.by == "desc" ? <FaSortAlphaUp /> : <FaSortAlphaDown />)}
+                </th>
+                <th onClick={() => handleSorting("gen")} style={{ cursor: "pointer" }}>
+                  Gen {sorting.field == "gen" && (sorting.by == "desc" ? <FaSortAlphaUp /> : <FaSortAlphaDown />)}
+                </th>
+                <th onClick={() => handleSorting("age")} style={{ cursor: "pointer" }}>
+                  Age {sorting.field == "age" && (sorting.by == "desc" ? <FaSortAlphaUp /> : <FaSortAlphaDown />)}
+                </th>
+                <th onClick={() => handleSorting("nationality")} style={{ cursor: "pointer" }}>
+                  Nationality {sorting.field == "nationality" && (sorting.by == "desc" ? <FaSortAlphaUp /> : <FaSortAlphaDown />)}
+                </th>
+                <th onClick={() => handleSorting("phone")} style={{ cursor: "pointer" }}>
+                  Phone {sorting.field == "phone" && (sorting.by == "desc" ? <FaSortAlphaUp /> : <FaSortAlphaDown />)}
+                </th>
                 <th></th>
               </tr>
             </thead>
@@ -107,7 +147,7 @@ export function SpaTable() {
                         <td>{SPA.nationality}</td>
                         <td>{SPA.phone_code} {SPA.phone}</td>
                         <td>
-                          {/* <FaEdit /> */}
+                          <FaEdit onClick={() => dispatch(toEdit(SPA))} />
                           <FaTrash onClick={() => dispatch(deleteFromList([SPA.id]))} />
                         </td>
                       </tr>
@@ -120,27 +160,26 @@ export function SpaTable() {
         </Col>
       </Row>
 
-      {/* <Row>
-        <Col>
-          <Pagination style={{ justifyContent: "center" }}>
-            <Pagination.First />
-            <Pagination.Prev />
-            <Pagination.Item>{1}</Pagination.Item>
-            <Pagination.Ellipsis />
-
-            <Pagination.Item>{10}</Pagination.Item>
-            <Pagination.Item>{11}</Pagination.Item>
-            <Pagination.Item active>{12}</Pagination.Item>
-            <Pagination.Item>{13}</Pagination.Item>
-            <Pagination.Item disabled>{14}</Pagination.Item>
-
-            <Pagination.Ellipsis />
-            <Pagination.Item>{20}</Pagination.Item>
-            <Pagination.Next />
-            <Pagination.Last />
-          </Pagination>
-        </Col>
-      </Row> */}
+      {
+        SPAs && SPAs.length > 0 &&
+        <Row>
+          <Col>
+            <ReactPaginate
+              previousLabel={'previous'}
+              nextLabel={'next'}
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={Math.ceil(SPAs.length / pages.perPage)}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={pages.perPage}
+              onPageChange={handlePageClick}
+              containerClassName={'pagination'}
+              subContainerClassName={'pages pagination'}
+              activeClassName={'active'}
+            />
+          </Col>
+        </Row>
+      }
     </Form>
   )
 }
